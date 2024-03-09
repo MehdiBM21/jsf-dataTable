@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+<f:view>
+<!--    <f:loadBundle basename="com.example.resources.messages" var="messages" />-->
+
+    <h:head>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+        <link rel="stylesheet" href="employees.css"/>
+<!--        <f:loadBundle basename="messages" var="messages" />-->
+    </h:head>
+    <body class="bg-dark text-light">
+    <div class="header">
+        <p><h:outputText value="#{messages.headersubtitle}" /></p>
+        <div class="header-right-ctnr">
+            <h:form>
+                <h:commandButton value="English" action="#{employeeBean.changeLanguage('en')}" styleClass="btn btn-primary" />
+                <h:commandButton value="French" action="#{employeeBean.changeLanguage('fr')}" styleClass="btn btn-primary" />
+            </h:form>
+<!--            <p><h:outputText value="#{messages.headerauthor}" /></p>-->
+        </div>
+    </div>
+    <div class="main-content bg-dark text-light">
+        <h1><u><h:outputText value="#{messages.headertitle}" /></u></h1>
+        <h:messages globalOnly="true" styleClass="text-warning"/>
+        <div class="table-container">
+            <h:form>
+                <p:dataTable var="employee"
+                             paginator="true"
+                             paginatorPosition="bottom"
+                             rows="4"
+                             value="#{employeeBean.employees}"
+                             tableStyleClass="table table-striped table-dark"
+                             rowStyleClass="text-info bold">
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="#{messages.tableid}" />
+                        </f:facet>
+                        <h:inputText value="#{employee.id}" rendered="false" />
+                        <h:outputText value="#{employee.id}" rendered="true" />
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="#{messages.tablenom}" />
+                        </f:facet>
+                        <h:inputText id="nom-table" value="#{employee.nom}" rendered="#{employee.edit}" required="true" requiredMessage="#{messages.validationrequirednom}" />
+                        <br/>
+                        <h:message for="nom-table" styleClass="text-danger"/>
+                        <h:outputText value="#{employee.nom}" rendered="#{!employee.edit}" />
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="#{messages.tableprenom}" />
+                        </f:facet>
+                        <h:inputText id="prenom-table" value="#{employee.prenom}" rendered="#{employee.edit}" required="true" requiredMessage="#{messages.validationrequiredprenom}" />
+                        <br/>
+                        <h:message for="prenom-table" styleClass="text-danger"/>
+                        <h:outputText value="#{employee.prenom}" rendered="#{!employee.edit}"/>
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="#{messages.tableemail}" />
+                        </f:facet>
+                        <h:inputText id="email-table" value="#{employee.email}" rendered="#{employee.edit}" required="true" requiredMessage="#{messages.validationrequiredemail}" >
+                            <f:validator validatorId="emailValidator"/>
+                        </h:inputText>
+                        <br/>
+                        <h:message for="email-table" styleClass="text-danger"/>
+                        <h:outputText value="#{employee.email}" rendered="#{!employee.edit}" />
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="#{messages.tablebirthday}" />
+                        </f:facet>
+                        <h:inputText  id="birthday-table" value="#{employee.birthday}" converter="localDateConverter"  rendered="#{employee.edit}" required="true" requiredMessage="#{messages.validationrequiredbirthday}"/>
+                        <br/>
+                        <h:message for="birthday-table" styleClass="text-danger"/>
+                        <h:outputText value="#{employee.birthday}" rendered="#{!employee.edit}" />
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="#{messages.tabledepartement}" />
+                        </f:facet>
+                        <h:inputText id="departement-table" value="#{employee.departement}" rendered="#{employee.edit}" required="true" requiredMessage="#{messages.validationrequireddepartement}"/>
+                        <br/>
+                        <h:message for="departement-table" styleClass="text-danger"/>
+                        <h:outputText value="#{employee.departement}" rendered="#{!employee.edit}" />
+                    </p:column>
+                    <p:column width="200px">
+                        <f:facet name="header">
+                            <h:outputText value="#{messages.tableactions}" />
+                        </f:facet>
+                        <div class="act-ctnr">
+                            <h:commandButton value="#{messages.buttonedit}" action="#{employee.switchEdit()}" styleClass="btn btn-primary" rendered="#{!employee.edit}" />
+                            <h:commandButton value="#{messages.buttonsave}" action="#{employeeService.updateUser(employee)}" styleClass="btn btn-success" rendered="#{employee.edit}" />
+                            <h:commandButton value="#{messages.buttondelete}" action="#{employeeService.deleteUser(employee.id)}" styleClass="btn btn-danger" rendered="#{!employee.edit}" />
+                        </div>
+                    </p:column>
+                </p:dataTable>
+                <div class="actions">
+                    <h:commandButton value="#{messages.buttonrefresh}" action="#{employeeBean.refresh()}" styleClass="btn btn-primary"/>
+                    <h:commandButton value="#{messages.buttonaddemployee}" action="#{employeeBean.switchForm()}" rendered="#{!employeeBean.form}" styleClass="btn btn-primary"  />
+                </div>
+            </h:form>
+            <div class="add-form">
+                <h:form rendered="#{employeeBean.form}">
+                    <h:panelGrid columns="2">
+                        <h:outputLabel for="nom" value="#{messages.tablenom}" />
+                        <h:panelGroup>
+                            <h:inputText id="nom" value="#{employee.nom}" required="true" requiredMessage="#{messages.validationrequirednom}" />
+                            <br/>
+                            <h:message for="nom" styleClass="text-danger" />
+                        </h:panelGroup>
+                        <h:outputLabel for="prenom" value="#{messages.tableprenom}" />
+                        <h:panelGroup>
+                            <h:inputText id="prenom" value="#{employee.prenom}" required="true" requiredMessage="#{messages.validationrequiredprenom}" />
+                            <br/>
+                            <h:message for="prenom" styleClass="text-danger" />
+                        </h:panelGroup>
+                        <h:outputLabel for="email" value="#{messages.tableemail}" />
+                        <h:panelGroup>
+                            <h:inputText id="email" value="#{employee.email}" required="true" requiredMessage="#{messages.validationrequiredemail}" >
+                                <f:validator validatorId="emailValidator"/>
+                            </h:inputText>
+                            <br/>
+                            <h:message for="email" styleClass="text-danger" />
+                        </h:panelGroup>
+                        <h:outputLabel for="birthday" value="#{messages.tablebirthday}" />
+                        <h:panelGroup>
+                            <h:inputText id="birthday" value="#{employee.birthday}" converter="localDateConverter" required="true" requiredMessage="#{messages.validationrequiredbirthday}" />
+                            <br/>
+                            <h:message for="birthday" styleClass="text-danger" />
+                        </h:panelGroup>
+                        <h:outputLabel for="departement" value="#{messages.tabledepartement}" />
+                        <h:panelGroup>
+                            <h:inputText id="departement" value="#{employee.departement}" required="true" requiredMessage="#{messages.validationrequireddepartement}" />
+                            <br/>
+                            <h:message for="departement" styleClass="text-danger" />
+                        </h:panelGroup>
+                    </h:panelGrid>
+                    <div class="center">
+                        <h:commandButton value="#{messages.buttonadd}" action="#{employeeService.addEmployee(employee)}" styleClass="btn btn-success" style="margin: 25px;"/>
+                    </div>
+                </h:form>
+                <h:form>
+                    <h:commandButton value="#{messages.buttoncancel}" action="#{employeeBean.switchForm()}" rendered="#{employeeBean.form}" styleClass="btn btn-warning" style="margin-bottom: 10px;" />
+                </h:form>
+            </div>
+        </div>
+    </div>
+    <div class="footer">
+        <p><h:outputText value="#{messages.headerauthor}" /></p>
+        <p><h:outputText value="#{messages.footertext}" /></p>
+    </div>
+    </body>
+</f:view>
+</html>
